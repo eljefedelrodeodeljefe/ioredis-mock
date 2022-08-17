@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { list as ioredisCommands } from '@ioredis/commands';
 import { EventEmitter } from 'events'
 import { parseURL } from 'ioredis/built/utils/index'
 
@@ -21,6 +22,10 @@ const defaultOptions = {
   host: 'localhost',
   port: 6379,
 }
+
+// based off of implementation https://github.com/luin/ioredis/blob/08c9072b24fa301401d424494c1ec8cde7ccf78b/lib/utils/Commander.ts#L97-L98
+const builtInCommands = ioredisCommands.filter((command) => command !== 'monitor')
+builtInCommands.push('sentinel')
 
 const pathToHostPort = path => {
   const { host, port } = parseURL(path)
@@ -237,6 +242,14 @@ class RedisMock extends EventEmitter {
         })
       }
     })
+  }
+
+  /**
+   * Return supported builtin commands
+   */
+  // eslint-disable-next-line class-methods-use-this
+  getBuiltinCommands () {
+    return builtInCommands.slice(0)
   }
 }
 
